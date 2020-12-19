@@ -30,10 +30,7 @@ int main(int ac, char *av[])
         controller.registerCommand("display", std::make_shared<SetDeviceDisplay>());
         controller.registerCommand("history", std::make_shared<ShowDeviceHistory>());
         controller.registerCommand("state", std::make_shared<ShowDeviceState>());
-
-
         controller.dispatch(args);
-
     }
     catch (std::exception &e)
     {
