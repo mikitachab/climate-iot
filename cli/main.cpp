@@ -22,17 +22,17 @@ int main(int ac, char *av[])
 
         auto args = parseArgs(ac, av, desc);
 
-        if (args.count("help"))
+        if (args.count("help") || ac < 2)
         {
             std::cout << desc << std::endl;
+            exit(0);
         }
         Controller controller;
         controller.registerCommand("display", std::make_shared<SetDeviceDisplay>());
         controller.registerCommand("history", std::make_shared<ShowDeviceHistory>());
         controller.registerCommand("state", std::make_shared<ShowDeviceState>());
         controller.dispatch(args);
-    }
-    catch (std::exception &e)
+    } catch (std::exception &e)
     {
         std::cerr << "error: " << e.what() << "\n";
         return 1;

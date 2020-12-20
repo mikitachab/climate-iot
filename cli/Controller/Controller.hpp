@@ -2,7 +2,6 @@
 
 #include <boost/program_options.hpp>
 
-#include <vector>
 #include <unordered_map>
 #include <string>
 
