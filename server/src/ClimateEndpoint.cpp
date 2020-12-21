@@ -1,3 +1,4 @@
+#include <iostream>
 #include "ClimateEndpoint.hpp"
 
 
@@ -32,5 +33,6 @@ void ClimateEndpoint::getDeviceHistory(const Rest::Request& request, Http::Respo
 }
 
 void ClimateEndpoint::setDeviceDisplay(const Rest::Request& request, Http::ResponseWriter response){
+    std::cout << request.body() << std::endl;
     response.send(Http::Code::Ok, "set device display");
 }

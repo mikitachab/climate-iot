@@ -22,5 +22,4 @@ private:
 
     std::shared_ptr<Http::Endpoint> httpEndpoint;
     Rest::Router router;
-    Repository repository;
 };
