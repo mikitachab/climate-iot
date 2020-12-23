@@ -1,10 +1,29 @@
 #include "SQLite.hpp"
 
 SQLite::SQLite(std::string dbPath) {
-    sqlite3_open(dbPath.c_str(), &db);
-    // TODO check open success
+    int rc;
+    rc = sqlite3_open(dbPath.c_str(), &db);
+    if( rc ) {
+        good = false;
+        errorMsg = std::string(sqlite3_errmsg(db));
+    } else {
+        good = true;
+    }
 }
 
 SQLite::~SQLite() {
     sqlite3_close(db);
+}
+
+int SQLite::execute(SQLite::Query q){
+    char* queryErrorMsg = 0;
+    int rc;
+    rc = sqlite3_exec(db, q.sql.c_str(), q.cb, 0, &queryErrorMsg);
+
+    if( rc != SQLITE_OK ){
+      errorMsg = std::string(queryErrorMsg);
+      sqlite3_free(queryErrorMsg);
+      return rc;
+    }
+    return rc;
 }

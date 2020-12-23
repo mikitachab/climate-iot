@@ -16,16 +16,25 @@ if(NOT json_POPULATED)
   FetchContent_Populate(json)
   add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
+find_package (SQLite3)
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 add_executable(climate-server)
-target_include_directories(climate-server PUBLIC ${HIREDIS_HEADER} ${REDIS_PLUS_PLUS_HEADER})
-target_link_libraries(climate-server pistache_shared ${REDIS_PLUS_PLUS_LIB})
-
+target_include_directories(climate-server
+    PUBLIC
+      ${HIREDIS_HEADER}
+      ${REDIS_PLUS_PLUS_HEADER}
+)
+target_link_libraries(climate-server
+  pistache_shared
+  ${REDIS_PLUS_PLUS_LIB}
+  SQLite::SQLite3
+)
 target_sources(climate-server PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ClimateEndpoint.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Repository.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/SQLite.cpp
 )
