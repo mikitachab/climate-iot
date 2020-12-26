@@ -19,6 +19,12 @@ int main()
         std::cout << "error " << repo.error() << std::endl;
         return 1;
     }
+    error = repo.addDevice("device-0");
+    if (error)
+    {
+        std::cout << "error " << repo.error() << std::endl;
+        return 1;
+    }
     std::cout << "ok" << std::endl;
     return 0;
 };
