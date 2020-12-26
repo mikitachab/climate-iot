@@ -2,9 +2,11 @@
 #include <string>
 #include <sqlite3.h>
 
-class SQLite {
+class SQLite
+{
 public:
-    struct Query {
+    struct Query
+    {
         std::string sql;
         sqlite3_callback cb;
     };
@@ -14,7 +16,8 @@ public:
 
     bool good;
     std::string errorMsg;
-    int execute(Query q);
+    int execute(SQLite::Query q);
+
 private:
-    sqlite3* db;
+    sqlite3 *db;
 };
