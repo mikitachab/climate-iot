@@ -19,11 +19,27 @@ int main()
         std::cout << "error " << repo.error() << std::endl;
         return 1;
     }
-    error = repo.addDevice("device-0");
+    // error = repo.addDevice("device-0");
+    // if (error)
+    // {
+    //     std::cout << "error " << repo.error() << std::endl;
+    //     return 1;
+    // }
+    auto devs = repo.getAllDevices();
+    for (const auto &d : devs)
+    {
+        std::cout << d.id << " " << d.name << std::endl;
+    }
+    error = repo.addHistoryRecord(1, 24.4f, "2020-01-15 10:33:11");
     if (error)
     {
         std::cout << "error " << repo.error() << std::endl;
         return 1;
+    }
+    auto history = repo.getDeviceHistory(1);
+    for (const auto &h : history.data)
+    {
+        std::cout << h.datetime << " " << h.temperature << std::endl;
     }
     std::cout << "ok" << std::endl;
     return 0;

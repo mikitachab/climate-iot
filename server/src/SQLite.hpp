@@ -9,6 +9,7 @@ public:
     {
         std::string sql;
         sqlite3_callback cb;
+        void *queryObj;
     };
 
     SQLite(std::string dbPath);

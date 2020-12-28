@@ -27,7 +27,7 @@ int SQLite::execute(SQLite::Query q)
     char *queryErrorMsg = 0;
     int rc;
 
-    rc = sqlite3_exec(db, q.sql.c_str(), q.cb, static_cast<void *>(&q), &queryErrorMsg);
+    rc = sqlite3_exec(db, q.sql.c_str(), q.cb, q.queryObj, &queryErrorMsg);
 
     if (rc != SQLITE_OK && queryErrorMsg)
     {
