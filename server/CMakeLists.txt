@@ -31,6 +31,7 @@ target_link_libraries(climate-server
   pistache_shared
   ${REDIS_PLUS_PLUS_LIB}
   SQLite::SQLite3
+  nlohmann_json::nlohmann_json
 )
 target_sources(climate-server PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp

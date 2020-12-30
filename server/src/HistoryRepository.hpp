@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 #include <iostream>
 #include <vector>
@@ -147,6 +148,31 @@ struct GetDeviceHistory
     }
 };
 
+struct GetDeviceByName
+{
+    Device device;
+    std::string name;
+    GetDeviceByName(std::string name) : name(name) {}
+    static int callback(void *obj, int argc, char **argv, char **azColName)
+    {
+        GetDeviceByName *self = static_cast<GetDeviceByName *>(obj);
+        const char *id = argv[0] ? argv[0] : "-1";
+        self->device.name = self->name;
+        self->device.id = std::stoi(id);
+        return 0;
+    }
+
+    std::string sql()
+    {
+        return "SELECT id FROM device WHERE name= \"" + name + "\";";
+    }
+
+    SQLite::Query query()
+    {
+        return SQLite::Query{sql(), callback, static_cast<void *>(this)};
+    }
+};
+
 class HistoryRepository
 {
 public:
@@ -190,6 +216,19 @@ public:
         // TODO how to check for error here?
         db->execute(gdh.query());
         return gdh.deviceHistory;
+    }
+
+    int getDeviceIdByName(std::string name)
+    {
+        GetDeviceByName gdbn(name);
+        db->execute(gdbn.query());
+        return gdbn.device.id;
+    }
+
+    DeviceHistory getDeviceHistoryByDeviceName(std::string name)
+    {
+        int deviceId = getDeviceIdByName(name);
+        return getDeviceHistory(deviceId);
     }
 
 private:
