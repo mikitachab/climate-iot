@@ -16,7 +16,7 @@ int main()
         return 1;
     }
 
-    Address addr(Pistache::Ipv4::any(), Pistache::Port(9080));
+    Address addr(Pistache::Ipv4::any(), Pistache::Port(9081));
     ClimateEndpoint ce(addr, repo);
     ce.init();
     ce.start();

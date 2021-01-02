@@ -2,6 +2,7 @@
 #include <nlohmann/json.hpp>
 
 #include "ClimateEndpoint.hpp"
+#include "utils.hpp"
 
 using json = nlohmann::json;
 using namespace Pistache;
@@ -29,36 +30,26 @@ void ClimateEndpoint::setupRoutes()
 {
     using namespace Rest;
     Routes::Get(router, "/device/state/", Routes::bind(&ClimateEndpoint::getDeviceState, this));
-    Routes::Get(router, "/device/history/", Routes::bind(&ClimateEndpoint::getDeviceHistory, this));
+    Routes::Get(router, "/device/history/:device", Routes::bind(&ClimateEndpoint::getDeviceHistory, this));
     Routes::Post(router, "/device/display/", Routes::bind(&ClimateEndpoint::setDeviceDisplay, this));
 }
 
-void ClimateEndpoint::getDeviceState(const Rest::Request &request, Http::ResponseWriter response)
+json makeJsonHistoryRecord(HistoryRecord hr)
 {
-    response.send(Http::Code::Ok, "get device state");
-}
-
-double ToTwoDecimalPlaces(double d) // TODO move to utils or similar
-{
-
-    int i;
-    if (d >= 0)
-        i = static_cast<int>(d * 100 + 0.5);
-    else
-        i = static_cast<int>(d * 100 - 0.5);
-    return (i / 100.0);
+    json record;
+    record["datetime"] = hr.datetime;
+    record["temperature"] = utils::toTwoDecimalPlaces(hr.temperature);
+    return record;
 }
 
 void ClimateEndpoint::getDeviceHistory(const Rest::Request &request, Http::ResponseWriter response)
 {
+    auto deviceName = request.param(":device").as<std::string>();
+    auto history = historyRepository->getDeviceHistoryByDeviceName(deviceName);
     json historyJson = json::array();
-    auto history = historyRepository->getDeviceHistoryByDeviceName("device-0");
-    for (const auto &h : history.data)
+    for (const auto &hr : history.data)
     {
-        json record;
-        record["datetime"] = h.datetime;
-        record["temperature"] = ToTwoDecimalPlaces(h.temperature);
-        historyJson.push_back(record);
+        historyJson.push_back(makeJsonHistoryRecord(hr));
     }
     response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
     response.send(Http::Code::Ok, historyJson.dump());
@@ -68,4 +59,9 @@ void ClimateEndpoint::setDeviceDisplay(const Rest::Request &request, Http::Respo
 {
     std::cout << request.body() << std::endl;
     response.send(Http::Code::Ok, "set device display");
+}
+
+void ClimateEndpoint::getDeviceState(const Rest::Request &request, Http::ResponseWriter response)
+{
+    response.send(Http::Code::Ok, "get device state");
 }
