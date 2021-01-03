@@ -15,11 +15,14 @@ void Controller::dispatch(po::variables_map vm)
     cmd->execute(vm);
 }
 
-
-std::string Controller::getCommandName(po::variables_map args){
-    for (const auto& cmd : commandMap) {
-        if (args.count(cmd.first)) {
+std::string Controller::getCommandName(po::variables_map args)
+{
+    for (const auto &cmd : commandMap)
+    {
+        if (args.count(cmd.first))
+        {
             return cmd.first;
         }
     }
+    throw BadUsage();
 }

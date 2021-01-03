@@ -16,9 +16,10 @@ int main(int ac, char *av[])
     try
     {
         desc.add_options()("help,h", "produce help message")
+            ("device,d", po::value<std::string>(), "device")
             ("display", "set display text for device")
-            ("history", "show story")
-            ("state", "show story");
+            ("history", "show history")
+            ("state", "show state");
 
         auto args = parseArgs(ac, av, desc);
 
