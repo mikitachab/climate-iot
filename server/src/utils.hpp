@@ -1,3 +1,4 @@
+#pragma once
 namespace utils
 {
     double toTwoDecimalPlaces(double d) // TODO move to utils or similar

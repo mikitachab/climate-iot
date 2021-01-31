@@ -46,7 +46,7 @@ struct ShowDeviceHistory : Command
         const std::string url = "/device/history/" + device;
         std::cout << url << std::endl;
         auto res = client.Get(url.c_str());
-        std::cout << "result body"<< std::endl;
+        std::cout << "result body" << std::endl;
         std::cout << res->body << std::endl;
     }
 };

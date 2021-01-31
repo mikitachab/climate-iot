@@ -46,13 +46,23 @@ void ClimateEndpoint::getDeviceHistory(const Rest::Request &request, Http::Respo
 {
     auto deviceName = request.param(":device").as<std::string>();
     auto history = historyRepository->getDeviceHistoryByDeviceName(deviceName);
-    json historyJson = json::array();
-    for (const auto &hr : history.data)
+    if (history.deviceExists)
     {
-        historyJson.push_back(makeJsonHistoryRecord(hr));
+        json historyJson = json::array();
+        for (const auto &hr : history.data)
+        {
+            historyJson.push_back(makeJsonHistoryRecord(hr));
+        }
+        response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
+        response.send(Http::Code::Ok, historyJson.dump());
     }
-    response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
-    response.send(Http::Code::Ok, historyJson.dump());
+    else
+    {
+        json messsage;
+        messsage["message"] = "device " + deviceName + " not found";
+        response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
+        response.send(Http::Code::Not_Found, messsage.dump());
+    }
 }
 
 void ClimateEndpoint::setDeviceDisplay(const Rest::Request &request, Http::ResponseWriter response)

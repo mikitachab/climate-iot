@@ -21,7 +21,7 @@ struct HistoryRecord
 
 struct DeviceHistory
 {
-    // Device device;
+    bool deviceExists{true};
     std::vector<HistoryRecord> data;
 };
 
@@ -152,13 +152,16 @@ struct GetDeviceByName
 {
     Device device;
     std::string name;
+    bool found{false};
     GetDeviceByName(std::string name) : name(name) {}
     static int callback(void *obj, int argc, char **argv, char **azColName)
     {
+
         GetDeviceByName *self = static_cast<GetDeviceByName *>(obj);
         const char *id = argv[0] ? argv[0] : "-1";
         self->device.name = self->name;
         self->device.id = std::stoi(id);
+        self->found = true;
         return 0;
     }
 
@@ -222,12 +225,16 @@ public:
     {
         GetDeviceByName gdbn(name);
         db->execute(gdbn.query());
-        return gdbn.device.id;
+        return gdbn.found ? gdbn.device.id : -1;
     }
 
     DeviceHistory getDeviceHistoryByDeviceName(std::string name)
     {
         int deviceId = getDeviceIdByName(name);
+        if (deviceId == -1)
+        {
+            return DeviceHistory{false, std::vector<HistoryRecord>(0)};
+        }
         return getDeviceHistory(deviceId);
     }
 
