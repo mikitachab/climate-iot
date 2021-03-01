@@ -4,8 +4,12 @@
 
 #include <boost/program_options.hpp>
 #include <httplib.h>
+#include <nlohmann/json.hpp>
+
+#include "ClimateClient/ClimateClient.hpp"
 
 namespace po = boost::program_options;
+using json = nlohmann::json;
 
 class BadUsage : public std::exception
 {
@@ -36,17 +40,39 @@ struct SetDeviceDisplay : Command
     }
 };
 
+class HistoryPrinter
+{
+public:
+    HistoryPrinter(json history) : history(history) {}
+    void print()
+    {
+        for (auto row : history)
+        {
+            std::cout << row["datetime"] << " " << row["temperature"] << " C" << std::endl;
+        }
+    }
+
+private:
+    json history;
+};
+
 struct ShowDeviceHistory : Command
 {
     void execute(po::variables_map args)
     {
+        ClimateClient c;
         std::cout << "show device history" << std::endl;
         const std::string device = args["device"].as<std::string>();
-        httplib::Client client("localhost", 9081); // TODO get it from env var or boost::po
-        const std::string url = "/device/history/" + device;
-        std::cout << url << std::endl;
-        auto res = client.Get(url.c_str());
-        std::cout << "result body" << std::endl;
-        std::cout << res->body << std::endl;
+        json history = c.getDeviceHistoryJson(device);
+        if (history.find("message") != history.end())
+        {
+            std::cout << history["message"] << std::endl;
+        }
+        else
+        {
+            HistoryPrinter hp(history);
+            hp.print();
+        }
+        // std::cout << history << std::endl;
     }
 };

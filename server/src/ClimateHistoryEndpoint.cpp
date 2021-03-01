@@ -1,18 +1,18 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 
-#include "ClimateEndpoint.hpp"
+#include "ClimateHistoryEndpoint.hpp"
 #include "utils.hpp"
 
 using json = nlohmann::json;
 using namespace Pistache;
 
-ClimateEndpoint::ClimateEndpoint(Address addr, HistoryRepository repo) : httpEndpoint(std::make_shared<Http::Endpoint>(addr)),
+ClimateHistoryEndpoint::ClimateHistoryEndpoint(Address addr, HistoryRepository repo) : httpEndpoint(std::make_shared<Http::Endpoint>(addr)),
                                                                          historyRepository(std::make_shared<HistoryRepository>(repo))
 {
 }
 
-void ClimateEndpoint::init(size_t thr)
+void ClimateHistoryEndpoint::init(size_t thr)
 {
     auto opts = Pistache::Http::Endpoint::options()
                     .threads(static_cast<int>(thr));
@@ -20,18 +20,17 @@ void ClimateEndpoint::init(size_t thr)
     setupRoutes();
 }
 
-void ClimateEndpoint::start()
+void ClimateHistoryEndpoint::start()
 {
     httpEndpoint->setHandler(router.handler());
     httpEndpoint->serve();
 }
 
-void ClimateEndpoint::setupRoutes()
+void ClimateHistoryEndpoint::setupRoutes()
 {
     using namespace Rest;
-    Routes::Get(router, "/device/state/", Routes::bind(&ClimateEndpoint::getDeviceState, this));
-    Routes::Get(router, "/device/history/:device", Routes::bind(&ClimateEndpoint::getDeviceHistory, this));
-    Routes::Post(router, "/device/display/", Routes::bind(&ClimateEndpoint::setDeviceDisplay, this));
+    Routes::Get(router, "/device/:device/history", Routes::bind(&ClimateHistoryEndpoint::getDeviceHistoryRecords, this));
+    Routes::Post(router, "/device/:device/history", Routes::bind(&ClimateHistoryEndpoint::addDeviceHistoryRecord, this));
 }
 
 json makeJsonHistoryRecord(HistoryRecord hr)
@@ -42,7 +41,11 @@ json makeJsonHistoryRecord(HistoryRecord hr)
     return record;
 }
 
-void ClimateEndpoint::getDeviceHistory(const Rest::Request &request, Http::ResponseWriter response)
+void ClimateHistoryEndpoint::addDeviceHistoryRecord(const Rest::Request &request, Http::ResponseWriter response) {
+
+}
+
+void ClimateHistoryEndpoint::getDeviceHistoryRecords(const Rest::Request &request, Http::ResponseWriter response)
 {
     auto deviceName = request.param(":device").as<std::string>();
     auto history = historyRepository->getDeviceHistoryByDeviceName(deviceName);
@@ -63,15 +66,4 @@ void ClimateEndpoint::getDeviceHistory(const Rest::Request &request, Http::Respo
         response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
         response.send(Http::Code::Not_Found, messsage.dump());
     }
-}
-
-void ClimateEndpoint::setDeviceDisplay(const Rest::Request &request, Http::ResponseWriter response)
-{
-    std::cout << request.body() << std::endl;
-    response.send(Http::Code::Ok, "set device display");
-}
-
-void ClimateEndpoint::getDeviceState(const Rest::Request &request, Http::ResponseWriter response)
-{
-    response.send(Http::Code::Ok, "get device state");
 }
