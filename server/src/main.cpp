@@ -14,10 +14,12 @@ int main(int ac, char *av[])
 {
     po::options_description desc("Allowed options");
     desc.add_options()("help,h", "produce help message")
-            ("port,d", po::value<size_t>()->default_value(9081))
+            ("port", po::value<size_t>()->default_value(9082))
             ("db", po::value<std::string>()->default_value("test.db"));
 
     auto args = parseArgs(ac, av, desc);
+
+    std::cout << args["port"].as<size_t>() << std::endl;
 
 
     auto db = std::make_shared<SQLite>(args["db"].as<std::string>());

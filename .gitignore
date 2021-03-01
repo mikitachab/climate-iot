@@ -3,3 +3,7 @@ build
 sandbox.txt
 todo.md
 venv
+__pycache__
+.tox
+.pytest_cache
+test.db

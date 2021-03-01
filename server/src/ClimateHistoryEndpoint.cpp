@@ -31,6 +31,8 @@ void ClimateHistoryEndpoint::setupRoutes()
     using namespace Rest;
     Routes::Get(router, "/device/:device/history", Routes::bind(&ClimateHistoryEndpoint::getDeviceHistoryRecords, this));
     Routes::Post(router, "/device/:device/history", Routes::bind(&ClimateHistoryEndpoint::addDeviceHistoryRecord, this));
+    Routes::Get(router, "/ping", Routes::bind(&ClimateHistoryEndpoint::ping, this));
+
 }
 
 json makeJsonHistoryRecord(HistoryRecord hr)
@@ -66,4 +68,8 @@ void ClimateHistoryEndpoint::getDeviceHistoryRecords(const Rest::Request &reques
         response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
         response.send(Http::Code::Not_Found, messsage.dump());
     }
+}
+
+void ClimateHistoryEndpoint::ping(const Rest::Request &request, Http::ResponseWriter response){
+        response.send(Http::Code::Ok, "PONG");
 }
