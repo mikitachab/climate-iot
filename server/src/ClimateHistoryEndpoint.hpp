@@ -21,6 +21,8 @@ private:
 
     void getDeviceHistoryRecords(const Rest::Request &, Http::ResponseWriter);
     void addDeviceHistoryRecord(const Rest::Request &, Http::ResponseWriter);
+    void addDevice(const Rest::Request &, Http::ResponseWriter);
+    void getDevices(const Rest::Request &, Http::ResponseWriter);
     void ping(const Rest::Request &, Http::ResponseWriter);
 
 

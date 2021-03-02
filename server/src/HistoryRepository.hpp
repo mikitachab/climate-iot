@@ -185,6 +185,7 @@ public:
         CreateHistoryTablesQuery chtq;
         return db->execute(chtq.query());
     }
+
     int addDevice(std::string deviceName)
     {
         AddDeviceQuery adq{deviceName};
