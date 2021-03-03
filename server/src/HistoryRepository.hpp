@@ -156,7 +156,6 @@ struct GetDeviceByName
     GetDeviceByName(std::string name) : name(name) {}
     static int callback(void *obj, int argc, char **argv, char **azColName)
     {
-
         GetDeviceByName *self = static_cast<GetDeviceByName *>(obj);
         const char *id = argv[0] ? argv[0] : "-1";
         self->device.name = self->name;

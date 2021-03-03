@@ -9,10 +9,10 @@
 
 using namespace Pistache;
 
-class ClimateHistoryEndpoint
+class ClimateServer
 {
 public:
-    explicit ClimateHistoryEndpoint(Address, HistoryRepository);
+    explicit ClimateServer(Address, HistoryRepository);
     void init(size_t thr = 2);
     void start();
 

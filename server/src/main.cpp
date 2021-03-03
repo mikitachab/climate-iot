@@ -3,7 +3,7 @@
 // #include <sw/redis++/redis++.h>
 #include <boost/program_options.hpp>
 
-#include "ClimateHistoryEndpoint.hpp"
+#include "ClimateServer.hpp"
 #include "SQLite.hpp"
 #include "HistoryRepository.hpp"
 
@@ -32,33 +32,10 @@ int main(int ac, char *av[])
     }
 
     Address addr(Pistache::Ipv4::any(), Pistache::Port(args["port"].as<size_t>()));
-    ClimateHistoryEndpoint ce(addr, repo);
+    ClimateServer ce(addr, repo);
     ce.init();
     ce.start();
 
-    // error = repo.addDevice("device-0");
-    // if (error)
-    // {
-    //     std::cout << "error " << repo.error() << std::endl;
-    //     return 1;
-    // }
-    // auto devs = repo.getAllDevices();
-    // for (const auto &d : devs)
-    // {
-    //     std::cout << d.id << " " << d.name << std::endl;
-    // }
-    // error = repo.addHistoryRecord(1, 24.4f, "2020-01-15 10:33:11");
-    // if (error)
-    // {
-    //     std::cout << "error " << repo.error() << std::endl;
-    //     return 1;
-    // }
-    // auto history = repo.getDeviceHistoryByDeviceName("device-0");
-    // for (const auto &h : history.data)
-    // {
-    //     std::cout << h.datetime << " " << h.temperature << std::endl;
-    // }
-    // std::cout << "ok" << std::endl;
     return 0;
 };
 

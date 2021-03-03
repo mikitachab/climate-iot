@@ -36,6 +36,6 @@ target_link_libraries(climate-server
 )
 target_sources(climate-server PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ClimateHistoryEndpoint.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ClimateServer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SQLite.cpp
 )

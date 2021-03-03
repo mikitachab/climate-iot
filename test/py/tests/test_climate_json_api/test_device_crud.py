@@ -21,3 +21,12 @@ def test_can_get_added_devices(live_url):
     devices = resp.json()
     assert len(devices) == 2
     assert sorted([dev_1, dev_2]) == sorted([d["name"] for d in devices])
+
+
+def test_unique_device(live_url):
+    requests.post(live_url + "/devices", json={"name": "dev-0"})
+    
+    resp = requests.post(live_url + "/devices", json={"name": "dev-0"})
+
+    assert resp.status_code == 400
+    assert resp.json().get("message") is not None
