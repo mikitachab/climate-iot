@@ -5,25 +5,8 @@
 #include <vector>
 
 #include "SQLite.hpp"
+#include "ClimateRepository.hpp"
 
-struct Device
-{
-    int id;
-    std::string name;
-};
-
-struct HistoryRecord
-{
-    // int deviceId;
-    float temperature;
-    std::string datetime;
-};
-
-struct DeviceHistory
-{
-    bool deviceExists{true};
-    std::vector<HistoryRecord> data;
-};
 
 struct CreateHistoryTablesQuery
 {
@@ -148,15 +131,15 @@ struct GetDeviceHistory
     }
 };
 
-struct GetDeviceByName
+struct GetDeviceByNameQuery
 {
     Device device;
     std::string name;
     bool found{false};
-    GetDeviceByName(std::string name) : name(name) {}
+    GetDeviceByNameQuery(std::string name) : name(name) {}
     static int callback(void *obj, int argc, char **argv, char **azColName)
     {
-        GetDeviceByName *self = static_cast<GetDeviceByName *>(obj);
+        GetDeviceByNameQuery *self = static_cast<GetDeviceByNameQuery *>(obj);
         const char *id = argv[0] ? argv[0] : "-1";
         self->device.name = self->name;
         self->device.id = std::stoi(id);
@@ -175,10 +158,12 @@ struct GetDeviceByName
     }
 };
 
-class HistoryRepository
+class SQLiteHistoryRepository : public IClimateRepository
 {
 public:
-    HistoryRepository(std::shared_ptr<SQLite> db) : db(db) {}
+    SQLiteHistoryRepository(std::shared_ptr<SQLite> db) : db(db) {
+        init();
+    }
     int init()
     {
         CreateHistoryTablesQuery chtq;
@@ -223,7 +208,7 @@ public:
 
     int getDeviceIdByName(std::string name)
     {
-        GetDeviceByName gdbn(name);
+        GetDeviceByNameQuery gdbn(name);
         db->execute(gdbn.query());
         return gdbn.found ? gdbn.device.id : -1;
     }

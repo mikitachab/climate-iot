@@ -6,6 +6,7 @@
 #include "ClimateServer.hpp"
 #include "SQLite.hpp"
 #include "HistoryRepository.hpp"
+#include "ClimateRepository.hpp"
 
 namespace po = boost::program_options;
 po::variables_map parseArgs(int argc, char *argv[], po::options_description od);
@@ -21,15 +22,8 @@ int main(int ac, char *av[])
 
     std::cout << args["port"].as<size_t>() << std::endl;
 
-
     auto db = std::make_shared<SQLite>(args["db"].as<std::string>());
-    HistoryRepository repo(db);
-    int error = repo.init();
-    if (error)
-    {
-        std::cout << "error " << repo.error() << std::endl;
-        return 1;
-    }
+    auto repo = std::shared_ptr<IClimateRepository>(new SQLiteHistoryRepository(db));
 
     Address addr(Pistache::Ipv4::any(), Pistache::Port(args["port"].as<size_t>()));
     ClimateServer ce(addr, repo);

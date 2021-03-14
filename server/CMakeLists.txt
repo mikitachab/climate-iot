@@ -39,3 +39,4 @@ target_sources(climate-server PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ClimateServer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SQLite.cpp
 )
+target_compile_features(climate-server PRIVATE cxx_std_17)

@@ -12,7 +12,7 @@ using namespace Pistache;
 class ClimateServer
 {
 public:
-    explicit ClimateServer(Address, HistoryRepository);
+    explicit ClimateServer(Address, std::shared_ptr<IClimateRepository>);
     void init(size_t thr = 2);
     void start();
 
@@ -25,8 +25,7 @@ private:
     void getDevices(const Rest::Request &, Http::ResponseWriter);
     void ping(const Rest::Request &, Http::ResponseWriter);
 
-
     std::shared_ptr<Http::Endpoint> httpEndpoint;
-    std::shared_ptr<HistoryRepository> historyRepository;
+    std::shared_ptr<IClimateRepository> historyRepository;
     Rest::Router router;
 };

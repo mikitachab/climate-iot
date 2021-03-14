@@ -7,8 +7,8 @@
 using json = nlohmann::json;
 using namespace Pistache;
 
-ClimateServer::ClimateServer(Address addr, HistoryRepository repo) : httpEndpoint(std::make_shared<Http::Endpoint>(addr)),
-                                                                         historyRepository(std::make_shared<HistoryRepository>(repo))
+ClimateServer::ClimateServer(Address addr, std::shared_ptr<IClimateRepository> repo) : httpEndpoint(std::make_shared<Http::Endpoint>(addr)),
+                                                                         historyRepository(repo)
 {
 }
 
