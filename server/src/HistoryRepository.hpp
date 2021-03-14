@@ -164,22 +164,29 @@ public:
     SQLiteHistoryRepository(std::shared_ptr<SQLite> db) : db(db) {
         init();
     }
-    int init()
+    void init()
     {
+        // TODO fix error handling
         CreateHistoryTablesQuery chtq;
-        return db->execute(chtq.query());
+        db->execute(chtq.query());
     }
 
-    int addDevice(std::string deviceName)
+    Result<> addDevice(std::string deviceName)
     {
         AddDeviceQuery adq{deviceName};
-        return db->execute(adq.query());
+        if (db->execute(adq.query()) != SQLITE_OK){
+            return Result<>::fail(db->errorMsg);
+        }
+        return Result<>::success();
     }
 
-    int addHistoryRecord(int deviceId, float temperature, std::string datetime)
+    Result<> addHistoryRecord(int deviceId, float temperature, std::string datetime)
     {
         AddHistoryRecordQuery ahr{deviceId, temperature, datetime};
-        return db->execute(ahr.query());
+        if(db->execute(ahr.query()) != SQLITE_OK){
+            return Result<>::fail(db->errorMsg);
+        };
+        return Result<>::success();
     }
 
     std::string error()
@@ -190,37 +197,42 @@ public:
         }
         return db->errorMsg;
     }
-    std::vector<Device> getAllDevices()
+    Result<std::vector<Device>> getAllDevices()
     {
         GetAllDevices gad;
-        // TODO how to check for error here?
-        db->execute(gad.query());
-        return gad.devices;
+        if(db->execute(gad.query()) != SQLITE_OK){
+            return Result<std::vector<Device>>::fail(db->errorMsg);
+        };
+        return Result<std::vector<Device>>::success(gad.devices);
     }
 
-    DeviceHistory getDeviceHistory(int deviceId)
+    Result<DeviceHistory> getDeviceHistory(int deviceId)
     {
         GetDeviceHistory gdh(deviceId);
-        // TODO how to check for error here?
-        db->execute(gdh.query());
-        return gdh.deviceHistory;
+        if(db->execute(gdh.query()) != SQLITE_OK){
+            return Result<DeviceHistory>::fail(db->errorMsg);
+        };
+        return Result<DeviceHistory>::success(gdh.deviceHistory);
     }
 
-    int getDeviceIdByName(std::string name)
+    Result<int> getDeviceIdByName(std::string name)
     {
         GetDeviceByNameQuery gdbn(name);
         db->execute(gdbn.query());
-        return gdbn.found ? gdbn.device.id : -1;
+        if (gdbn.found){
+            return Result<int>::success(gdbn.device.id);
+        }
+        return Result<int>::fail("Device not found");
     }
 
-    DeviceHistory getDeviceHistoryByDeviceName(std::string name)
+    Result<DeviceHistory> getDeviceHistoryByDeviceName(std::string name)
     {
-        int deviceId = getDeviceIdByName(name);
-        if (deviceId == -1)
+        auto result = getDeviceIdByName(name);
+        if (!result.ok)
         {
-            return DeviceHistory{false, std::vector<HistoryRecord>(0)};
+            return Result<DeviceHistory>::fail(result.errorMsg.value());
         }
-        return getDeviceHistory(deviceId);
+        return getDeviceHistory(result.data.value());
     }
 
 private:

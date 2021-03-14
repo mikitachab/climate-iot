@@ -3,12 +3,14 @@
 
 #include "ClimateServer.hpp"
 #include "utils.hpp"
+#include "Result.hpp"
 
 using json = nlohmann::json;
 using namespace Pistache;
 
-ClimateServer::ClimateServer(Address addr, std::shared_ptr<IClimateRepository> repo) : httpEndpoint(std::make_shared<Http::Endpoint>(addr)),
-                                                                         historyRepository(repo)
+ClimateServer::ClimateServer(Address addr, std::shared_ptr<IClimateRepository> repo) : 
+    httpEndpoint(std::make_shared<Http::Endpoint>(addr)),
+    historyRepository(repo)
 {
 }
 
@@ -47,7 +49,8 @@ json makeJsonHistoryRecord(HistoryRecord hr)
 void ClimateServer::addDeviceHistoryRecord(const Rest::Request &request, Http::ResponseWriter response) {
     auto body = json::parse(request.body());
     auto deviceName = request.param(":device").as<std::string>();
-    int id = historyRepository->getDeviceIdByName(deviceName);
+    auto result = historyRepository->getDeviceIdByName(deviceName);
+    int id = result.data.value();
     historyRepository->addHistoryRecord(id, body["temperature"], body["datetime"]);
     json record;
     record["temperature"] = body["temperature"];
@@ -58,9 +61,10 @@ void ClimateServer::addDeviceHistoryRecord(const Rest::Request &request, Http::R
 void ClimateServer::getDeviceHistoryRecords(const Rest::Request &request, Http::ResponseWriter response)
 {
     auto deviceName = request.param(":device").as<std::string>();
-    auto history = historyRepository->getDeviceHistoryByDeviceName(deviceName);
-    if (history.deviceExists)
+    auto result = historyRepository->getDeviceHistoryByDeviceName(deviceName);
+    if (result.ok)
     {
+        auto history = result.data.value();
         json historyJson = json::array();
         for (const auto &hr : history.data)
         {
@@ -85,7 +89,8 @@ void ClimateServer::ping(const Rest::Request &request, Http::ResponseWriter resp
 void ClimateServer::addDevice(const Rest::Request &request, Http::ResponseWriter response){
     auto body = json::parse(request.body());
     std::string deviceName = body["name"];
-    if(!historyRepository->addDevice(deviceName)){
+    auto result = historyRepository->addDevice(deviceName);
+    if(result.ok){
         json device;
         device["name"] = deviceName;
         response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
@@ -97,7 +102,8 @@ void ClimateServer::addDevice(const Rest::Request &request, Http::ResponseWriter
 }
 
 void ClimateServer::getDevices(const Rest::Request &request, Http::ResponseWriter response){
-    auto devices =  historyRepository->getAllDevices();
+    auto result = historyRepository->getAllDevices();
+    auto devices = result.data.value();
     auto devicesJson = json::array();
     for (auto d: devices) {
         json deviceJson;

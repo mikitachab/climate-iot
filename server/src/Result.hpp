@@ -1,7 +1,8 @@
+#pragma once
 #include <string>
 #include <optional>
 
-template<typename T>
+template<typename T = int>
 struct Result {
     bool ok;
     std::optional<T> data;
@@ -9,6 +10,10 @@ struct Result {
 
     static Result<T> success(T data) {
         return Result<T>{true, data};
+    }
+
+    static Result<T> success() {
+        return Result<T>{true};
     }
 
     static Result<T> fail(std::string errorMsg){
