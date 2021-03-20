@@ -103,14 +103,14 @@ struct AddHistoryRecordQuery
     }
 };
 
-struct GetDeviceHistory
+struct GetDeviceHistoryQuery
 {
     DeviceHistory deviceHistory;
     int deviceId;
-    GetDeviceHistory(int id) : deviceId(id) {}
+    GetDeviceHistoryQuery(int id) : deviceId(id) {}
     static int callback(void *obj, int argc, char **argv, char **azColName)
     {
-        GetDeviceHistory *self = static_cast<GetDeviceHistory *>(obj);
+        GetDeviceHistoryQuery *self = static_cast<GetDeviceHistoryQuery *>(obj);
         HistoryRecord r;
         const char *temperature = argv[0] ? argv[0] : "-1";
         r.temperature = std::atof(temperature);
@@ -208,7 +208,7 @@ public:
 
     Result<DeviceHistory> getDeviceHistory(int deviceId)
     {
-        GetDeviceHistory gdh(deviceId);
+        GetDeviceHistoryQuery gdh(deviceId);
         if(db->execute(gdh.query()) != SQLITE_OK){
             return Result<DeviceHistory>::fail(db->errorMsg);
         };

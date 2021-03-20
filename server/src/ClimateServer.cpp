@@ -1,4 +1,6 @@
 #include <iostream>
+#include <functional>
+
 #include <nlohmann/json.hpp>
 
 #include "ClimateServer.hpp"
@@ -7,6 +9,7 @@
 
 using json = nlohmann::json;
 using namespace Pistache;
+
 
 ClimateServer::ClimateServer(Address addr, std::shared_ptr<IClimateRepository> repo) : 
     httpEndpoint(std::make_shared<Http::Endpoint>(addr)),
