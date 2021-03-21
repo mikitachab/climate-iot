@@ -37,6 +37,7 @@ struct CreateHistoryTablesQuery
 struct AddDeviceQuery
 {
     std::string deviceName;
+    int id;
     static int callback(void *obj, int argc, char **argv, char **azColName)
     {
         return 0;
@@ -171,13 +172,14 @@ public:
         db->execute(chtq.query());
     }
 
-    Result<> addDevice(std::string deviceName)
+    Result<Device> addDevice(std::string name)
     {
-        AddDeviceQuery adq{deviceName};
+        AddDeviceQuery adq{name};
         if (db->execute(adq.query()) != SQLITE_OK){
-            return Result<>::fail(db->errorMsg);
+            return Result<Device>::fail(db->errorMsg);
         }
-        return Result<>::success();
+        int id = db->lastInsertedId();
+        return Result<Device>::success(Device{id, name});
     }
 
     Result<> addHistoryRecord(int deviceId, float temperature, std::string datetime)

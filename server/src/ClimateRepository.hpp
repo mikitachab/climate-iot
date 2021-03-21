@@ -24,7 +24,7 @@ struct DeviceHistory
 
 class IClimateRepository {
 public:
-    virtual Result<> addDevice(std::string deviceName) = 0;
+    virtual Result<Device> addDevice(std::string deviceName) = 0;
     virtual Result<> addHistoryRecord(int deviceId, float temperature, std::string datetime) = 0;
     virtual Result<std::vector<Device>> getAllDevices() = 0;
     virtual Result<DeviceHistory> getDeviceHistory(int deviceId) = 0;

@@ -36,3 +36,7 @@ int SQLite::execute(SQLite::Query q)
     }
     return rc;
 }
+
+int SQLite::lastInsertedId() {
+    return sqlite3_last_insert_rowid(db);
+}

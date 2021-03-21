@@ -95,7 +95,8 @@ void ClimateServer::addDevice(const Rest::Request &request, Http::ResponseWriter
     auto result = historyRepository->addDevice(deviceName);
     if(result.ok){
         json device;
-        device["name"] = deviceName;
+        device["name"] = result.data.value().name;
+        device["id"] = result.data.value().id;
         response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
         response.send(Http::Code::Created, device.dump());
     } else {

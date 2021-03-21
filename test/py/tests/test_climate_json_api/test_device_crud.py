@@ -7,6 +7,7 @@ def test_add_device(live_url):
 
     assert resp.status_code == 201
     assert resp.json().get("name") == "dev-0"
+    assert "id" in resp.json().keys()
 
 
 def test_can_get_added_devices(live_url):

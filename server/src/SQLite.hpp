@@ -18,6 +18,7 @@ public:
     bool good;
     std::string errorMsg;
     int execute(SQLite::Query q);
+    int lastInsertedId();
 
 private:
     sqlite3 *db;
